@@ -8,4 +8,4 @@ class AuthUser(AbstractUser):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "{} {}".format(self.username, self.password)
+        return "{}".format(self.username)

@@ -1,10 +1,21 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 
 
 def valid_password(password):
-    if len(password) < 5:
-        return HttpResponse('Faild password: your password to small')
+    letter = False
+    number = False
+    up = False
+    low = False
     for x in password:
-        if not x.isalpha() and not x.isdigit() and not x.islower() and not x.islower():
-          return HttpResponse('Faild password: your password have not letters')
-    return password
+        if x.isalpha():
+            letter = True
+        if x.isdigit():
+            number = True
+        if x.isupper():
+            up = True
+        if x.islower():
+            low = True
+
+    if letter is True and number is True and up is True and low is True and len(password) > 5:
+        return password
+    return HttpResponse('Faild password: try again with password')

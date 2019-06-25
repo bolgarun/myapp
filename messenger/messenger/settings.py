@@ -14,8 +14,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-USER_DIR = os.path.join(BASE_DIR,'user')
-MYAPP_DIR = os.path.join(BASE_DIR,'myapp')
+USER_DIR = os.path.join(BASE_DIR, 'user')
+MYAPP_DIR = os.path.join(BASE_DIR, 'myapp')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -40,7 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'myapp.apps.MyappConfig',
     'user.apps.UserConfig',
+    'graphene_django',
+    'channels'
 ]
+
+GRAPHENE = {
+    'SCHEMA': 'messenger.schema.schema'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -81,8 +87,13 @@ WSGI_APPLICATION = 'messenger.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'djangoapp',
+        'USER': 'root',
+        'PASSWORD': '123',
+        'HOST': '',
+        'PORT': '',
+
     }
 }
 
@@ -127,3 +138,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = '/user/login/'
+
+ASGI_APPLICATION = "messenger.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
