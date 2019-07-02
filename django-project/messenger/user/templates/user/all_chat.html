@@ -1,0 +1,116 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+<br>
+<div class="col-md-12">  
+    <div class="col-md-4">      
+        <div class="portlet light profile-sidebar-portlet bordered">
+            <div class="container">
+                <h1>Chats</h1>
+                {% for chat in chats %}
+                <div class="row">
+                    <div class="panel list-group">
+                        <a class="navbar-link" id="recipient" value="{{chat.recipient.id}}" name="chat.recipient" href="{% url 'chat-profile-view' chat.id %}">
+                            <button class="list-group-item" data-toggle="collapse" data-target="#item-1" data-parent="#accordion"><strong>---------{{chat.name_chat}}---------</strong>
+                                {% for users in chat.users.all %}
+                                <p class="preview">{{users.username}}</p>
+                            {% endfor %}</button>
+                        </div>
+                        
+                </div>
+                {% endfor %}
+                </a>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@getbootstrap">Add new chat</button>
+                
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" data-whatever="@getbootstrap">Add group new chat</button>
+                <body>
+                    <nav class="navbar navbar-default navbar-static-top">
+                        <div class="container">
+                            <ul class="nav navbar-nav">
+                                <li><a class="navbar-link" href="{% url 'all-users' %}">Users</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                    <nav class="navbar navbar-default navbar-static-top">
+                        <div class="container">
+                            <ul class="nav navbar-nav">
+                                <li><a class="navbar-link" href="{% url 'all-chat' %}">Chats</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8"> 
+            <div class="portlet light bordered">
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select user: </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'add-new-chat' %}" id="text-modal">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <select multiple name="user">
+                                {% for u in users %}
+                                <option type="hidden" class="form-control" id="u" value="{{u.id}}" name="user">{{u.username}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" form="text-modal">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select user: </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'add-new-group-chat' %}" id="text-modal2">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control" id="text" name="text"></textarea>
+                            <select multiple name="user-group">
+                                {% for u in users %}
+                                <option type="hidden" class="form-control" id="u" value="{{u.id}}" name="user-group">{{u.username}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" form="text-modal2">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</div>
+</div>
+</div>
+

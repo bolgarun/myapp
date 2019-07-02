@@ -10,43 +10,45 @@
                 <div class="panel-heading">
                     <span class="glyphicon glyphicon-comment"></span> Chat
                 </div>
-                    {% for i in user_chat.messages.all %}     
+                       
                 <div class="panel-body">
-                    <ul class="chat">
-                        {% if i.author == user %}
-                        <li class="left clearfix"><span class="chat-img pull-left">
-                            <img src="http://placehold.it/35/55C1E7/fff&text=ME" alt="User Avatar" class="img-circle" />
-                        </span>
-                            <div class="chat-body clearfix">
-                                <div class="header">
-                                    <strong class="navbar-link"> <a class="navbar-link" href="{% url 'user-page' user.id %}">{{user.username}}</a></strong> <small class="pull-right text-muted">
-                                        <span class="glyphicon glyphicon-time"></span>{{i.created_at}}</small>
-                                </div>
-                                <p>
-                                    {{i.text}}
-                                </p>
-                            </div>
-                        </li>
-                        {% else %}
-                        <li class="right clearfix"><span class="chat-img pull-right">
-                            <img src="http://placehold.it/35/FA6F57/fff&text=U" alt="User Avatar" class="img-circle" />
-                        </span>
-                            <div class="chat-body clearfix">
-                                <div class="header">
-                                    <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{i.created_at}}</small>
-                                    
-                                    <strong class="pull-right primary-font"><a class="navbar-link" href="{% url 'user-page' i.author.id %}">{{i.author.username}}</a></strong>
-                                </div>
-                                <p class="pull-right primary-font">
-                                    {{i.text}}
-                                </p>
-                            </div>
-                        {% endif %}
-                        </li>
 
+                    <ul class="chat">
+                        {% for i in user_chat.messages.all %}  
+                            {% if i.author == user %}
+                            <li class="left clearfix"><span class="chat-img pull-left">
+                                <img src="http://placehold.it/35/55C1E7/fff&text=ME" alt="User Avatar" class="img-circle" />
+                            </span>
+                                <div class="chat-body clearfix">
+                                    <div class="header">
+                                        <strong class="navbar-link"> <a class="navbar-link" href="{% url 'user-page' user.id %}">{{user.username}}</a></strong> <small class="pull-right text-muted">
+                                            <span class="glyphicon glyphicon-time"></span>{{i.created_at}}</small>
+                                    </div>
+                                    <p>
+                                        {{i.text}}
+                                    </p>
+                                </div>
+                            </li>
+                            {% else %}
+                            <li class="right clearfix"><span class="chat-img pull-right">
+                                <img src="http://placehold.it/35/FA6F57/fff&text=U" alt="User Avatar" class="img-circle" />
+                            </span>
+                                <div class="chat-body clearfix">
+                                    <div class="header">
+                                        <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>{{i.created_at}}</small>
+                                        
+                                        <strong class="pull-right primary-font"><a class="navbar-link" href="{% url 'user-page' i.author.id %}">{{i.author.username}}</a></strong>
+                                    </div>
+                                    <p class="pull-right primary-font">
+                                        {{i.text}}
+                                    </p>
+                                </div>
+                            {% endif %}
+                            </li>
+                        {% endfor %}
                     </ul>
                 </div>
-                    {% endfor %}
+                    
                 <div class="modal-body">
                     <form method="POST" action="{% url 'create-message-in-chat' %}" id="text-modal">
                         {% csrf_token %}
@@ -67,7 +69,12 @@
 <script>
     var loc = window.location
     var roomName = '{{ user_chat.id }}';
-
+    var user = '{{user.username}}'
+    var listChat = []
+    {% for i in user_chat.messages.all %}
+        var author = '{{i.author}}'
+        var created_at = '{{i.created_at}}'
+    {% endfor %}
     var chatSocket = new WebSocket(
         'ws://' + window.location.host +
         '/chat-profile-view/' + roomName + '/');
@@ -75,8 +82,27 @@
     chatSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
-        alert(message)
-        document.querySelector('.chat').value += (message + '\n');
+        var test = $('.chat');
+
+        if (author == user){
+            test.append(
+                '<li class="left clearfix"><span class="chat-img pull-left">'+
+                '<img src="http://placehold.it/35/55C1E7/fff&text=ME" alt="User Avatar" class="img-circle" />'+
+                '</span><div class="chat-body clearfix"><div class="header">'+
+                '<strong class="navbar-link"> <a class="navbar-link">'+user+'</a>'+
+                '</strong> <small class="pull-right text-muted">'+
+                '<span class="glyphicon glyphicon-time"></span>'+created_at+'</small></div><p>'+message+'</p></div></li>')
+            } 
+        else {
+            test.append(
+                '<li class="right clearfix"><span class="chat-img pull-right">'+
+                '<img src="http://placehold.it/35/FA6F57/fff&text=U" alt="User Avatar" class="img-circle" />'+
+                '</span><div class="chat-body clearfix"><div class="header">'+
+                '<small class=" text-muted"><span class="glyphicon glyphicon-time"></span>'+created_at+'</small>'+
+                '<strong class="pull-right primary-font"><a class="navbar-link">'+author+'</a></strong>'+
+                '</div><p class="pull-right primary-font">'+message+'</p></div></li>')
+            }
+        return text  
     };
     chatSocket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
@@ -90,7 +116,7 @@
     };
 
     document.querySelector('#user_chat_submit').onclick = function(e) {
-        event.preventDefault();
+        e.preventDefault();
         var messageInputDom = document.querySelector('#text');
         var message = messageInputDom.value;
         chatSocket.send(JSON.stringify({

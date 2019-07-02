@@ -40,17 +40,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from room group
     async def chat_message(self, event):
         print(event['message'])
+        chat = Chat.objects.get(id=self.room_name)
         message = event['message']
+        message = Messages(
+            chat=chat,
+            author=self.scope['user'],
+            text=message,
+            )
+        message.save()
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': message.text
         }))
-
-        # chat = Chat.objects.get(id=self.room_name)
-        # messages = Messages(
-        #         chat=chat,
-        #         author=self.scope['user'],
-        #         text=message,
-        #         )
-        # messages.save()

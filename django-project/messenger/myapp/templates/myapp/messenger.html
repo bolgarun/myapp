@@ -1,0 +1,19 @@
+{% extends 'myapp/base_myapp.html' %}
+
+{% block title %}Messagner{% endblock %}
+{% block content %}
+
+<h2>You are logging in as <label class="userId" id="{{ user.id }}">{{ user.username }}</label></h2>
+
+<div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-3 users_list pre-scrollable">
+        <div class="list-group">
+            {% for user in users %}
+                <a class="navbar-brand" href="{% url 'user-page' user.id %}">{{user.username}}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

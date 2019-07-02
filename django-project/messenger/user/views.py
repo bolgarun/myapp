@@ -98,8 +98,9 @@ def message_create(request):
 
 
 def chat_profile_view(request, chat_id):
-    user_chat = Chat.objects.get(id=chat_id)
-    user_chat.assign_recipient(request.user)
+    user_chat = Chat.objects.filter(id=chat_id)
+    for i in user_chat:
+        i.assign_recipient(request.user)
     return render(
         request, 'user/chat.html',
         {'user_chat': user_chat})
@@ -143,9 +144,9 @@ def add_new_group_chat(request):
 
 def create_message_in_chat(request):
     chat_id = request.POST['user_chat']
-    user_chat = Chat.objects.get(id=chat_id)
+    user_chat = Chat.objects.filter(id=chat_id)
     message = Messages(
-            chat=user_chat,
+            chat=user_chat[0],
             author=request.user,
             text=request.POST['text'],
             )
