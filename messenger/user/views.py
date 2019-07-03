@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from user.forms import AuthUserForm
 from user.helpers import valid_password
 from myapp.models import Messages, Chat
+import datetime
+from messenger.settings import ISO_FORMAT
 
 
 @login_required
@@ -115,7 +117,7 @@ def all_chat(request):
 
 def add_new_chat(request):
     user_id = request.POST.getlist("user")
-    if len(user_id) < 2:
+    if len(user_id) <= 2:
         sender_chat = Chat.objects.filter(users=request.user)
         recipient_chat = Chat.objects.filter(users=''.join(user_id))
         intersect = list(set(sender_chat).intersection(recipient_chat))
@@ -129,7 +131,7 @@ def add_new_chat(request):
 
 def add_new_group_chat(request):
     user_id = request.POST.getlist("user-group")
-    if len(user_id) > 1:
+    if len(user_id) > 2:
         chat = Chat()
         chat.save()
         chat.users.add(request.user)

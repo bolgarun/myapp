@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'channels'
 ]
 
+ISO_FORMAT = "%Y-%m-%dT%H:%M:%S"
+
 GRAPHENE = {
     'SCHEMA': 'messenger.schema.schema'
 }
