@@ -59,6 +59,7 @@ def user_login(request):
         return render(request, 'user/login.html', {})
 
 
+@login_required
 def user_detail(request, user_id):
     user_profile = AuthUser.objects.filter(id=user_id).get()
     return render(
@@ -67,6 +68,7 @@ def user_detail(request, user_id):
         )
 
 
+@login_required
 def message_create(request):
     id_recipient = request.POST['recipient']
     recipient = AuthUser.objects.filter(id=id_recipient).get()
@@ -74,31 +76,34 @@ def message_create(request):
     recipient_chat = Chat.objects.filter(users=recipient)
     intersect = list(set(sender_chat).intersection(recipient_chat))
     if intersect:
-        message = Messages(
-            chat=intersect[0],
-            author=request.user,
-            text=request.POST['text'],
-            )
-        chat_id = intersect[0].id
-        message.save()
-    else:
-        chat = Chat()
-        chat.save()
-        chat.users.add(request.user)
-        chat.users.add(recipient)
-        chat.save()
-        message = Messages(
-            chat=chat,
-            author=request.user,
-            text=request.POST['text'],
-            )
-        chat_id = chat.id
-        message.save()
+        for x in intersect:
+            if x.is_private == True:
+                message = Messages(
+                    chat=intersect[0],
+                    author=request.user,
+                    text=request.POST['text'],
+                    )
+                chat_id = intersect[0].id
+                message.save()
+            else:
+                chat = Chat()
+                chat.save()
+                chat.users.add(request.user)
+                chat.users.add(recipient)
+                chat.save()
+                message = Messages(
+                    chat=chat,
+                    author=request.user,
+                    text=request.POST['text'],
+                    )
+                chat_id = chat.id
+                message.save()
     return HttpResponseRedirect(reverse(
         'chat-profile-view',
         kwargs={'chat_id': chat_id}))
 
 
+@login_required
 def chat_profile_view(request, chat_id):
     user_chat = Chat.objects.get(id=chat_id)
     user_chat.assign_recipient(request.user)
@@ -107,6 +112,7 @@ def chat_profile_view(request, chat_id):
         {'user_chat': user_chat})
 
 
+@login_required
 def all_chat(request):
     users = AuthUser.objects.all().exclude(username=request.user.username)
     chats = request.user.chat_set.all()
@@ -115,9 +121,10 @@ def all_chat(request):
     return render(request, 'user/all_chat.html', {'chats': chats, 'users': users})
 
 
+@login_required
 def add_new_chat(request):
     user_id = request.POST.getlist("user")
-    if len(user_id) <= 2:
+    if len(user_id) == 1:
         sender_chat = Chat.objects.filter(users=request.user)
         recipient_chat = Chat.objects.filter(users=''.join(user_id))
         intersect = list(set(sender_chat).intersection(recipient_chat))
@@ -129,13 +136,16 @@ def add_new_chat(request):
 
     return HttpResponseRedirect(reverse('all-chat'))
 
+
+@login_required
 def add_new_group_chat(request):
     user_id = request.POST.getlist("user-group")
-    if len(user_id) > 2:
+    if len(user_id) > 1:
         chat = Chat()
         chat.save()
         chat.users.add(request.user)
         chat.name_chat = request.POST['text']
+        chat.is_private = False
         for u in user_id:
             chat.users.add(u)
             chat.save()
