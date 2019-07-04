@@ -70,44 +70,27 @@ def user_detail(request, user_id):
 
 @login_required
 def message_create(request):
-    id_recipient = request.POST['recipient']
-    recipient = AuthUser.objects.filter(id=id_recipient).get()
+    recipient = AuthUser.objects.get(id=request.POST['recipient'])
     sender_chat = Chat.objects.filter(users=request.user)
     recipient_chat = Chat.objects.filter(users=recipient)
-    intersect = list(set(sender_chat).intersection(recipient_chat))
-    print(intersect)
+    intersect = [
+        intersect_chat 
+        for intersect_chat in list(set(sender_chat).intersection(recipient_chat)) 
+        if intersect_chat.is_private
+    ]
     if intersect:
-        for intersect_chat in intersect:
-            if intersect_chat.is_private == True:
-                print(1)
-                print(intersect_chat)
-                message = Messages(
-                    chat=intersect_chat,
-                    author=request.user,
-                    text=request.POST['text'],
-                    )
-                chat_id = intersect_chat.id
-                message.save()
-            else:
-                chat = Chat()
-                chat.save()
-                chat.users.add(request.user)
-                chat.users.add(recipient)
-                chat.save()
-                message = Messages(
-                    chat=chat,
-                    author=request.user,
-                    text=request.POST['text'],
-                    )
-                chat_id = chat.id
-                message.save()
-                break
+        chat_id = intersect.pop(0)
+        message = Messages(
+            chat=chat_id,
+            author=request.user,
+            text=request.POST['text'],
+            )
+        chat_id = chat_id.id
+        message.save()
     else:
-        print(3)
         chat = Chat()
         chat.save()
-        chat.users.add(request.user)
-        chat.users.add(recipient)
+        chat.users.add(request.user, recipient)
         chat.save()
         message = Messages(
             chat=chat,

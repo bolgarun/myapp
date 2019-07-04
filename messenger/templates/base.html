@@ -10,18 +10,16 @@
 {% block includes %}{% endblock  %}
 <body>
     <nav class="navbar navbar-default navbar-static-top">
-        <div class="container">
-            <ul class="nav navbar-nav">
-                <li><a class="navbar-brand" href="{% url 'index' %}">Messenger</a></li>
-                <li><a class="navbar-link" href="{% url 'register' %}">Register</a></li>
-                <li><a class="navbar-link" href="{% url 'all-users' %}">Users</a></li>
-                <li><a class="navbar-link" href="{% url 'all-chat' %}">Chat</a></li>
+        <div class="container" align = "middle">
+                <li><a class="navbar-brand" href="{% url 'index' %}"><span style = "color:orange">Messenger</span></a></li>
+                <li><a class="navbar-brand" href="{% url 'register' %}"><span style = "color:blue">Register</span></a></li>
+                <li><a class="navbar-brand" href="{% url 'all-users' %}"><span style = "color:green">Users</span></a></li>
+                <li><a class="navbar-brand" href="{% url 'all-chat' %}"><span style = "color:red">Chat</span></a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                    <li><a class="navbar-brand" href="{% url 'logout' %}"><span style = "color:brown">Logout</span></a></li>
                 {% else %}
-                <li><a class="navbar-link" href="{% url 'login' %}">Login</a></li>
+                <li><a class="navbar-brand" href="{% url 'login' %}">Login</a></li>
                 {% endif %}
-            </ul>
                 <form class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                     <button type="button" class="btn btn-light">Search</button>
