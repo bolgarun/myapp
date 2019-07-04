@@ -75,15 +75,18 @@ def message_create(request):
     sender_chat = Chat.objects.filter(users=request.user)
     recipient_chat = Chat.objects.filter(users=recipient)
     intersect = list(set(sender_chat).intersection(recipient_chat))
+    print(intersect)
     if intersect:
-        for x in intersect:
-            if x.is_private == True:
+        for intersect_chat in intersect:
+            if intersect_chat.is_private == True:
+                print(1)
+                print(intersect_chat)
                 message = Messages(
-                    chat=intersect[0],
+                    chat=intersect_chat,
                     author=request.user,
                     text=request.POST['text'],
                     )
-                chat_id = intersect[0].id
+                chat_id = intersect_chat.id
                 message.save()
             else:
                 chat = Chat()
@@ -98,6 +101,21 @@ def message_create(request):
                     )
                 chat_id = chat.id
                 message.save()
+                break
+    else:
+        print(3)
+        chat = Chat()
+        chat.save()
+        chat.users.add(request.user)
+        chat.users.add(recipient)
+        chat.save()
+        message = Messages(
+            chat=chat,
+            author=request.user,
+            text=request.POST['text'],
+            )
+        chat_id = chat.id
+        message.save()
     return HttpResponseRedirect(reverse(
         'chat-profile-view',
         kwargs={'chat_id': chat_id}))
